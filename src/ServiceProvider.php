@@ -2,6 +2,7 @@
 
 namespace DoeAnderson\StatamicCloudinary;
 
+use DoeAnderson\StatamicCloudinary\Actions\UploadImageAction;
 use DoeAnderson\StatamicCloudinary\Subscriber;
 use Statamic\Console\Commands\Install;
 use Statamic\Facades\CP\Nav;
@@ -16,6 +17,10 @@ class ServiceProvider extends AddonServiceProvider
      */
     protected $routes = [
         'cp' => __DIR__ . '/../routes/cp.php',
+    ];
+
+    protected $actions = [
+        UploadImageAction::class,
     ];
 
     /**
