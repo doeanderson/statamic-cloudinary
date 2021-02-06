@@ -2,8 +2,7 @@
 
 namespace DoeAnderson\StatamicCloudinary;
 
-use DoeAnderson\StatamicCloudinary\Subscribers\AssetEventSubscriber;
-
+use DoeAnderson\StatamicCloudinary\Subscriber;
 use Statamic\Console\Commands\Install;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
@@ -23,7 +22,7 @@ class ServiceProvider extends AddonServiceProvider
      * @var string[]
      */
     protected $subscribe = [
-        AssetEventSubscriber::class,
+        Subscriber::class,
     ];
 
     public function boot(): void

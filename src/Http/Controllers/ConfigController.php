@@ -3,10 +3,11 @@
 namespace DoeAnderson\StatamicCloudinary\Http\Controllers;
 
 use Cloudinary\Api\Exception\ApiError;
-use DoeAnderson\StatamicCloudinary\Helpers\Cloudinary as CloudinaryHelper;
+use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper as CloudinaryHelper;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\AssetContainer as AssetContainerApi;
 use Statamic\Facades\Blueprint as BlueprintApi;
@@ -84,9 +85,17 @@ class ConfigController extends Controller
     protected function getBlueprint(): Blueprint
     {
         $assetContainerOptions = AssetContainerApi::all()
-            ->flatMap(fn(AssetContainer $assetContainer) => [$assetContainer->handle() => $assetContainer->title()]);
+            ->flatMap(function (AssetContainer $assetContainer) {
+                return [$assetContainer->handle() => $assetContainer->title()];
+            });
 
-        $mediaFolderOptions = CloudinaryHelper::getMediaFolderOptions();
+        $mediaFolderOptions = Cache::remember('cloudinary-media-folder-options', 120, function () {
+            return CloudinaryHelper::getSubFolders();
+        })
+            ->prepend('')
+            ->map(function ($folder) {
+                return '/' . $folder;
+            });
 
         return BlueprintApi::makeFromFields([
             'cloudinary_url' => [
