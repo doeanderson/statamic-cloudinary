@@ -9,7 +9,7 @@ use Statamic\Actions\Action;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder;
 
-class UploadImageAction extends Action
+class UploadToCloudinaryAction extends Action
 {
     protected $confirm = true;
 
@@ -57,7 +57,11 @@ class UploadImageAction extends Action
                 dispatch(new UploadAssetJob($item));
             }
 
-            //TODO: handle AssetFolders
+            if ($item instanceof AssetFolder) {
+                $item->assets(true)->each(function (Asset $asset) {
+                    dispatch(new UploadAssetJob($asset));
+                });
+            }
         });
 
         return true;

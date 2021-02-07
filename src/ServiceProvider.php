@@ -2,7 +2,7 @@
 
 namespace DoeAnderson\StatamicCloudinary;
 
-use DoeAnderson\StatamicCloudinary\Actions\UploadImageAction;
+use DoeAnderson\StatamicCloudinary\Actions\UploadToCloudinaryAction;
 use DoeAnderson\StatamicCloudinary\Subscriber;
 use Statamic\Console\Commands\Install;
 use Statamic\Facades\CP\Nav;
@@ -20,7 +20,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $actions = [
-        UploadImageAction::class,
+        UploadToCloudinaryAction::class,
     ];
 
     /**
