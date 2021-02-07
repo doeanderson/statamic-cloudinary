@@ -9,8 +9,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Assets\Asset;
-use Statamic\Assets\AssetFolder;
+use Statamic\Facades\Asset as AssetApi;
 
 class ProcessSavedAssetJob implements ShouldQueue
 {
@@ -41,7 +42,12 @@ class ProcessSavedAssetJob implements ShouldQueue
             );
 
             $this->asset->set('cloudinary_public_id', $newPublicId);
-            $this->asset->save();
+
+            // Save asset without emitting event again.
+            AssetApi::save($this->asset);
+            Cache::delete($this->asset->metaCacheKey());
+            Cache::delete($this->asset->container()->filesCacheKey());
+            Cache::delete($this->asset->container()->filesCacheKey($this->asset->folder()));
         }
     }
 }
