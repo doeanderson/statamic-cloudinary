@@ -1,0 +1,27 @@
+{
+    "name": "doeanderson/statamic-cloudinary",
+    "description": "Cloudinary addon for Statamic 3",
+    "require": {
+        "cloudinary-labs/cloudinary-laravel": "^1.0",
+        "laravel/framework": "^7.0 || ^8.0",
+        "statamic/cms": "^3.0",
+        "stillat/proteus": "^1.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "DoeAnderson\\StatamicCloudinary\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Cloudinary",
+            "description": "Coudinary addon"
+        },
+        "laravel": {
+            "providers": [
+                "DoeAnderson\\StatamicCloudinary\\ServiceProvider"
+            ]
+        }
+    }
+}
