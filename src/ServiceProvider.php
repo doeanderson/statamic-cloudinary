@@ -78,7 +78,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->publishes(
             [
-                __DIR__ . '/../config/cloudinary.php' => config_path('statamic/cloudinary.php')
+                __DIR__ . '/../config/cloudinary.php' => config_path('statamic/cloudinary.php'),
             ],
             'statamic-cloudinary-config'
         );
