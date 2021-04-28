@@ -73,14 +73,6 @@ class UploadToCloudinaryAction extends Action
      */
     protected function itemIsValid($item)
     {
-        if (! $item instanceof Asset && ! $item instanceof AssetFolder) {
-            return false;
-        }
-
-        if ($item instanceof Asset && ! empty($item->get('cloudinary_public_id'))) {
-            return false;
-        }
-
-        return true;
+        return ($item instanceof Asset || $item instanceof AssetFolder);
     }
 }
