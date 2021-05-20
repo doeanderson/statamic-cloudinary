@@ -4,6 +4,7 @@ namespace DoeAnderson\StatamicCloudinary;
 
 use DoeAnderson\StatamicCloudinary\Actions\UploadToCloudinaryAction;
 use DoeAnderson\StatamicCloudinary\Subscriber;
+use Illuminate\Support\Facades\Artisan;
 use Statamic\Console\Commands\Install;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
@@ -39,7 +40,8 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonViews()
             ->bootPermissions()
             ->bootAddonNav()
-            ->bootPostInstall();
+            ->bootPostInstall()
+            ->publishAssets();
     }
 
     protected function bootAddonNav(): self
@@ -92,6 +94,16 @@ class ServiceProvider extends AddonServiceProvider
             $command->call('vendor:publish', [
                 '--tag' => 'statamic-cloudinary-config',
             ]);
+        });
+
+        return $this;
+    }
+
+    protected function publishAssets(): self
+    {
+        Statamic::afterInstalled(function () {
+            Artisan::call('vendor:publish --tag=cloudinary-laravel-config');
+            Artisan::call('vendor:publish --tag=statamic-cloudinary-config');
         });
 
         return $this;
