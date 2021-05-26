@@ -8,12 +8,13 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Assets\Asset;
 use Statamic\Facades\Asset as AssetApi;
 
-class ProcessSavedAssetJob implements ShouldQueue
+class RenameAssetJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -23,15 +24,15 @@ class ProcessSavedAssetJob implements ShouldQueue
     protected $asset;
 
     /**
-     * @var string|null
+     * @var string
      */
     protected $oldPath;
 
     /**
      * @param Asset $asset
-     * @param string|null $oldPath
+     * @param string $oldPath
      */
-    public function __construct(Asset $asset, string $oldPath = null)
+    public function __construct(Asset $asset, string $oldPath)
     {
         $this->asset = $asset;
         $this->oldPath = $oldPath;
@@ -52,10 +53,7 @@ class ProcessSavedAssetJob implements ShouldQueue
             );
 
             $this->asset->set('cloudinary_public_id', $newPublicId);
-
-            // Save asset without emitting AssetSaved event again.
-            AssetApi::save($this->asset);
-            Cache::forget($this->asset->metaCacheKey());
+            $this->asset->save();
         }
     }
 }

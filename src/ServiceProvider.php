@@ -3,7 +3,6 @@
 namespace DoeAnderson\StatamicCloudinary;
 
 use DoeAnderson\StatamicCloudinary\Actions\UploadToCloudinaryAction;
-use DoeAnderson\StatamicCloudinary\Subscriber;
 use Illuminate\Support\Facades\Artisan;
 use Statamic\Console\Commands\Install;
 use Statamic\Facades\CP\Nav;

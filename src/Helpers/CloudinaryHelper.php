@@ -106,6 +106,15 @@ class CloudinaryHelper
     }
 
     /**
+     * @param Asset $asset
+     * @return bool
+     */
+    public static function hasCloudinaryId(Asset $asset): bool
+    {
+        return ! is_null($asset->get('cloudinary_public_id'));
+    }
+
+    /**
      * Is cloudinary folder mapping configured for the asset's container?
      *
      * @param AssetContainer $assetContainer

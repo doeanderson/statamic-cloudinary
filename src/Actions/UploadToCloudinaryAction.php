@@ -63,8 +63,6 @@ class UploadToCloudinaryAction extends Action
                 });
             }
         });
-
-        return true;
     }
 
     /**
