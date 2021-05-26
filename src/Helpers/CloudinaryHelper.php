@@ -73,21 +73,34 @@ class CloudinaryHelper
      */
     public static function getPublicId(Asset $asset): string
     {
-        $fileExtension = pathinfo($asset->path())['extension'];
         return (string) Str::of($asset->path())
-            ->beforeLast('.' . $fileExtension)
+            ->beforeLast('.' . static::getFileExtension($asset))
             ->after('./');
     }
 
     /**
+     * Get asset's file extension.
+     *
+     * @param Asset $asset
+     * @return string
+     */
+    public static function getFileExtension(Asset $asset): string
+    {
+        return pathinfo($asset->path())['extension'];
+    }
+
+    /**
+     * Is the file renamed (ie: does the cloudinary path/id match the current path?)
+     *
      * @param Asset $asset
      * @return bool
      */
     public static function isAssetRenamed(Asset $asset): bool
     {
         $assetPublicId = $asset->get('cloudinary_public_id');
-        $file = Cloudinary::getFile($assetPublicId);
-        /* @var $file File */
+        if (empty($assetPublicId)) {
+            return false;
+        }
 
         return $assetPublicId !== static::getPublicId($asset);
     }

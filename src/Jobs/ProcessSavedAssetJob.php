@@ -22,9 +22,19 @@ class ProcessSavedAssetJob implements ShouldQueue
      */
     protected $asset;
 
-    public function __construct(Asset $asset)
+    /**
+     * @var string|null
+     */
+    protected $oldPath;
+
+    /**
+     * @param Asset $asset
+     * @param string|null $oldPath
+     */
+    public function __construct(Asset $asset, string $oldPath = null)
     {
         $this->asset = $asset;
+        $this->oldPath = $oldPath;
     }
 
     public function handle()
@@ -34,7 +44,7 @@ class ProcessSavedAssetJob implements ShouldQueue
             return;
         }
 
-        if (CloudinaryHelper::isAssetRenamed($this->asset)) {
+        if (! is_null($this->oldPath)) {
             $newPublicId = CloudinaryHelper::getPublicId($this->asset);
             Cloudinary::rename(
                 $currentPublicId,
@@ -43,11 +53,9 @@ class ProcessSavedAssetJob implements ShouldQueue
 
             $this->asset->set('cloudinary_public_id', $newPublicId);
 
-            // Save asset without emitting event again.
+            // Save asset without emitting AssetSaved event again.
             AssetApi::save($this->asset);
-            Cache::delete($this->asset->metaCacheKey());
-            Cache::delete($this->asset->container()->filesCacheKey());
-            Cache::delete($this->asset->container()->filesCacheKey($this->asset->folder()));
+            Cache::forget($this->asset->metaCacheKey());
         }
     }
 }

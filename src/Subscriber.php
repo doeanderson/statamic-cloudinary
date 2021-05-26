@@ -78,6 +78,10 @@ class Subscriber
             return;
         }
 
-        dispatch(new ProcessSavedAssetJob($event->asset));
+        $oldPath = CloudinaryHelper::isAssetRenamed($event->asset)
+            ? CloudinaryHelper::getPublicId($event->asset) . '.' . CloudinaryHelper::getFileExtension($event->asset)
+            : null;
+
+        dispatch(new ProcessSavedAssetJob($event->asset, $oldPath));
     }
 }
