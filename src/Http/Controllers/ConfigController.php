@@ -104,7 +104,7 @@ class ConfigController extends Controller
                 'type' => 'text',
                 'read_only' => true,
                 'required' => true,
-                'instructions' => 'This must be set in the `cloudinary.cloud_url` config or as an env variable `CLOUDINARY_URL`.',
+                'instructions' => 'This must be set in the `cloudinary.cloud_url` config or as an env variable `CLOUDINARY_URL`. <br />See docs for more info: https://github.com/cloudinary-labs/cloudinary-laravel',
             ],
             'asset_container_mappings' => [
                 'fields' => [

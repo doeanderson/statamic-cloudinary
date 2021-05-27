@@ -8,12 +8,13 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Assets\Asset;
 use Statamic\Facades\Asset as AssetApi;
 
-class ProcessSavedAssetJob implements ShouldQueue
+class RenameAssetJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -22,9 +23,19 @@ class ProcessSavedAssetJob implements ShouldQueue
      */
     protected $asset;
 
-    public function __construct(Asset $asset)
+    /**
+     * @var string
+     */
+    protected $oldPath;
+
+    /**
+     * @param Asset $asset
+     * @param string $oldPath
+     */
+    public function __construct(Asset $asset, string $oldPath)
     {
         $this->asset = $asset;
+        $this->oldPath = $oldPath;
     }
 
     public function handle()
@@ -34,7 +45,7 @@ class ProcessSavedAssetJob implements ShouldQueue
             return;
         }
 
-        if (CloudinaryHelper::isAssetRenamed($this->asset)) {
+        if (! is_null($this->oldPath)) {
             $newPublicId = CloudinaryHelper::getPublicId($this->asset);
             Cloudinary::rename(
                 $currentPublicId,
@@ -42,12 +53,7 @@ class ProcessSavedAssetJob implements ShouldQueue
             );
 
             $this->asset->set('cloudinary_public_id', $newPublicId);
-
-            // Save asset without emitting event again.
-            AssetApi::save($this->asset);
-            Cache::delete($this->asset->metaCacheKey());
-            Cache::delete($this->asset->container()->filesCacheKey());
-            Cache::delete($this->asset->container()->filesCacheKey($this->asset->folder()));
+            $this->asset->save();
         }
     }
 }

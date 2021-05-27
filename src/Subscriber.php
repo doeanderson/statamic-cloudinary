@@ -4,7 +4,7 @@ namespace DoeAnderson\StatamicCloudinary;
 
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
-use DoeAnderson\StatamicCloudinary\Jobs\ProcessSavedAssetJob;
+use DoeAnderson\StatamicCloudinary\Jobs\RenameAssetJob;
 use DoeAnderson\StatamicCloudinary\Jobs\CreateFolderJob;
 use DoeAnderson\StatamicCloudinary\Jobs\DeleteAssetJob;
 use DoeAnderson\StatamicCloudinary\Jobs\DeleteFolderJob;
@@ -26,7 +26,7 @@ class Subscriber
         $events->listen(AssetDeleted::class, self::class . '@handleAssetDeleted');
         $events->listen(AssetFolderSaved::class, self::class . '@handleAssetFolderSaved');
         $events->listen(AssetFolderDeleted::class, self::class . '@handleAssetFolderDeleted');
-        $events->listen(AssetSaved::class, self::class . '@handleAssetSaved');
+        $events->listen(AssetSaved::class, self::class . '@handleAssetRenamed');
     }
 
     public function ensureCloudinaryBlueprintFields(AssetContainerBlueprintFound $event)
@@ -44,13 +44,13 @@ class Subscriber
             return;
         }
 
-        dispatch(new UploadAssetJob($event->asset));
+        dispatch_sync(new UploadAssetJob($event->asset));
     }
 
     public function handleAssetDeleted(AssetDeleted $event)
     {
         if (CloudinaryHelper::hasConfigurationForAssetContainer($event->asset->container())) {
-            dispatch(new DeleteAssetJob($event->asset));
+            dispatch_sync(new DeleteAssetJob($event->asset));
         }
     }
 
@@ -60,7 +60,7 @@ class Subscriber
             return;
         }
 
-        dispatch(new CreateFolderJob($event->folder));
+        dispatch_sync(new CreateFolderJob($event->folder));
     }
 
     public function handleAssetFolderDeleted(AssetFolderDeleted $event)
@@ -69,15 +69,25 @@ class Subscriber
             return;
         }
 
-        dispatch(new DeleteFolderJob($event->folder));
+        dispatch_sync(new DeleteFolderJob($event->folder));
     }
 
-    public function handleAssetSaved(AssetSaved $event)
+    public function handleAssetRenamed(AssetSaved $event)
     {
         if (! CloudinaryHelper::hasConfigurationForAssetContainer($event->asset->container())) {
             return;
         }
 
-        dispatch(new ProcessSavedAssetJob($event->asset));
+        if (! CloudinaryHelper::hasCloudinaryId($event->asset)) {
+            return;
+        }
+
+        if (! CloudinaryHelper::isAssetRenamed($event->asset)) {
+            return;
+        }
+
+        $oldPath = CloudinaryHelper::getPublicId($event->asset) . '.' . CloudinaryHelper::getFileExtension($event->asset);
+
+        dispatch_sync(new RenameAssetJob($event->asset, $oldPath));
     }
 }
