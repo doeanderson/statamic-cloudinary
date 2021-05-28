@@ -31,7 +31,7 @@ class CloudinaryTags extends Tags
      */
     public function image()
     {
-        $params = ['id'];
+        $params = ['asset', 'id'];
 
         $assetId = $this->params->get($params);
         if (empty($assetId)) {
