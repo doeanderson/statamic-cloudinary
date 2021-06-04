@@ -21,21 +21,11 @@ class Subscriber
 {
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(AssetContainerBlueprintFound::class, self::class . '@ensureCloudinaryBlueprintFields');
         $events->listen(AssetUploaded::class, self::class . '@handleAssetUploaded');
         $events->listen(AssetDeleted::class, self::class . '@handleAssetDeleted');
         $events->listen(AssetFolderSaved::class, self::class . '@handleAssetFolderSaved');
         $events->listen(AssetFolderDeleted::class, self::class . '@handleAssetFolderDeleted');
         $events->listen(AssetSaved::class, self::class . '@handleAssetRenamed');
-    }
-
-    public function ensureCloudinaryBlueprintFields(AssetContainerBlueprintFound $event)
-    {
-        if (! CloudinaryHelper::hasConfigurationForAssetContainer($event->container)) {
-            return;
-        }
-
-        (new AssetContainerBlueprint($event->blueprint))->setupFields();
     }
 
     public function handleAssetUploaded(AssetUploaded $event)
