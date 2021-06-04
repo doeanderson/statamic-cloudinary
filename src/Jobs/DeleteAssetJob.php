@@ -26,6 +26,13 @@ class DeleteAssetJob implements ShouldQueue
     {
         $this->asset = $asset;
     }
+    /**
+     * @return int
+     */
+    public function retryAfter(): int
+    {
+        return 30;
+    }
 
     public function handle()
     {

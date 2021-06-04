@@ -31,6 +31,14 @@ class UploadAssetJob implements ShouldQueue
         $this->asset = $asset;
     }
 
+    /**
+     * @return int
+     */
+    public function retryAfter(): int
+    {
+        return 30;
+    }
+
     public function handle()
     {
         $cloudinaryEngine = Cloudinary::upload(
@@ -41,6 +49,7 @@ class UploadAssetJob implements ShouldQueue
             ]
         );
         /* @var $cloudinaryEngine CloudinaryEngine */
+
 
         $this->asset
             ->set('cloudinary_public_id', $cloudinaryEngine->getResponse()['public_id'])
