@@ -38,6 +38,14 @@ class RenameAssetJob implements ShouldQueue
         $this->oldPath = $oldPath;
     }
 
+    /**
+     * @return int
+     */
+    public function retryAfter(): int
+    {
+        return 30;
+    }
+
     public function handle()
     {
         $currentPublicId = $this->asset->get('cloudinary_public_id');

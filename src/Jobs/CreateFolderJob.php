@@ -28,6 +28,13 @@ class CreateFolderJob implements ShouldQueue
     {
         $this->assetFolder = $assetFolder;
     }
+    /**
+     * @return int
+     */
+    public function retryAfter(): int
+    {
+        return 30;
+    }
 
     public function handle()
     {
