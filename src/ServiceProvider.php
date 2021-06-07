@@ -51,7 +51,6 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonViews()
             ->bootPermissions()
             ->bootAddonNav()
-            ->bootAssetContainerBlueprints()
             ->bootPostInstall()
             ->publishAssets();
     }
@@ -107,16 +106,6 @@ class ServiceProvider extends AddonServiceProvider
                 '--tag' => 'statamic-cloudinary-config',
             ]);
         });
-
-        return $this;
-    }
-
-    protected function bootAssetContainerBlueprints(): self
-    {
-        foreach (config('statamic.cloudinary.asset_container_mappings', []) as $mapping) {
-            $blueprint = Blueprint::find('assets/' . $mapping['asset_container']);
-            (new AssetContainerBlueprint($blueprint))->setupFields();
-        }
 
         return $this;
     }
