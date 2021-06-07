@@ -9,6 +9,8 @@ use Statamic\Console\Commands\Install;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
+use Statamic\Http\Resources\API\AssetResource;
+use Statamic\Http\Resources\API\Resource;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 
@@ -52,6 +54,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootPermissions()
             ->bootAddonNav()
             ->bootPostInstall()
+            ->bootCustomApiResources()
             ->publishAssets();
     }
 
@@ -66,6 +69,15 @@ class ServiceProvider extends AddonServiceProvider
                 ->can('configure cloudinary')
                 ->icon('settings-horizontal');
         });
+
+        return $this;
+    }
+
+    protected function bootCustomApiResources(): self
+    {
+        Resource::map([
+            \Statamic\Http\Resources\API\AssetResource::class => \DoeAnderson\StatamicCloudinary\Http\Resources\API\AssetResource::class
+        ]);
 
         return $this;
     }
