@@ -2,7 +2,6 @@
 
 namespace DoeAnderson\StatamicCloudinary;
 
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
 use DoeAnderson\StatamicCloudinary\Jobs\RenameAssetJob;
 use DoeAnderson\StatamicCloudinary\Jobs\CreateFolderJob;
@@ -16,16 +15,29 @@ use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Facades\Blink;
 
 class Subscriber
 {
     public function subscribe(Dispatcher $events)
     {
+        $events->listen(AssetContainerBlueprintFound::class, self::class . '@ensureCloudinaryBlueprintFields');
         $events->listen(AssetUploaded::class, self::class . '@handleAssetUploaded');
         $events->listen(AssetDeleted::class, self::class . '@handleAssetDeleted');
         $events->listen(AssetFolderSaved::class, self::class . '@handleAssetFolderSaved');
         $events->listen(AssetFolderDeleted::class, self::class . '@handleAssetFolderDeleted');
         $events->listen(AssetSaved::class, self::class . '@handleAssetRenamed');
+    }
+
+    public function ensureCloudinaryBlueprintFields(AssetContainerBlueprintFound $event)
+    {
+        Blink::once('cloudinary-asset-container-blueprint-fields_' . $event->blueprint->handle(), function () use ($event) {
+            if (! CloudinaryHelper::hasConfigurationForAssetContainer($event->container)) {
+                return;
+            }
+
+            (new AssetContainerBlueprint($event->blueprint))->setupFields();
+        });
     }
 
     public function handleAssetUploaded(AssetUploaded $event)
