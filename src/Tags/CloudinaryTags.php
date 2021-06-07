@@ -20,6 +20,15 @@ class CloudinaryTags extends Tags
 {
     protected static $handle = 'cloudinary';
 
+    /**
+     * These parameters are used by this tag internally and should not be rendered as <img> tag attributes.
+     *
+     * @var string[]
+     */
+    protected $reservedParams = [
+        'asset',
+    ];
+
     public function index()
     {
         return $this->image();
@@ -31,7 +40,7 @@ class CloudinaryTags extends Tags
      */
     public function image()
     {
-        $params = ['asset', 'id'];
+        $params = ['asset'];
 
         $assetId = $this->params->get($params);
         if (empty($assetId)) {
@@ -64,15 +73,31 @@ class CloudinaryTags extends Tags
          */
         $imageTag = new ImageTag($cloudinaryId);
 
-        $this->resize($imageTag);
+        $this
+            ->resize($imageTag)
+            ->setAttributesFromParams($imageTag);
 
         return $imageTag;
     }
 
     /**
+     * @param ImageTag $imageTag
+     */
+    protected function setAttributesFromParams(ImageTag $imageTag)
+    {
+        foreach ($this->params as $paramKey => $paramValue) {
+            if (in_array($paramKey, $this->reservedParams)) {
+                continue;
+            }
+
+            $imageTag->setAttribute($paramKey, $paramValue);
+        }
+    }
+
+    /**
      * @throws TransformationModeNotFoundException
      */
-    protected function resize(ImageTag $imageTag)
+    protected function resize(ImageTag $imageTag): ?self
     {
         $width = $this->params->get('width');
         $height = $this->params->get('height');
@@ -92,5 +117,7 @@ class CloudinaryTags extends Tags
                 $imageTag->$resizeMode($width, $height);
             }
         }
+
+        return $this;
     }
 }

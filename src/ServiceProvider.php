@@ -3,12 +3,16 @@
 namespace DoeAnderson\StatamicCloudinary;
 
 use DoeAnderson\StatamicCloudinary\Actions\UploadToCloudinaryAction;
+use DoeAnderson\StatamicCloudinary\GraphQL\FieldManager;
 use DoeAnderson\StatamicCloudinary\Tags\CloudinaryTags;
 use Illuminate\Support\Facades\Artisan;
 use Statamic\Console\Commands\Install;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
+use Statamic\Http\Resources\API\AssetResource;
+use Statamic\Http\Resources\API\Resource;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 
@@ -52,6 +56,8 @@ class ServiceProvider extends AddonServiceProvider
             ->bootPermissions()
             ->bootAddonNav()
             ->bootPostInstall()
+            ->bootCustomApiResources()
+            ->bootCustomGraphQLFields()
             ->publishAssets();
     }
 
@@ -66,6 +72,22 @@ class ServiceProvider extends AddonServiceProvider
                 ->can('configure cloudinary')
                 ->icon('settings-horizontal');
         });
+
+        return $this;
+    }
+
+    protected function bootCustomApiResources(): self
+    {
+        Resource::map([
+            \Statamic\Http\Resources\API\AssetResource::class => \DoeAnderson\StatamicCloudinary\Http\Resources\API\AssetResource::class
+        ]);
+
+        return $this;
+    }
+
+    protected function bootCustomGraphQLFields(): self
+    {
+        (new FieldManager())->registerCustomFields();
 
         return $this;
     }
