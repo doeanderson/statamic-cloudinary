@@ -29,7 +29,7 @@ class AssetContainerBlueprint
                 'type' => 'text',
                 'read_only' => true,
             ],
-            'Cloudinary',
+            'Cloudinary'
         );
     }
 
