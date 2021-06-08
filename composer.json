@@ -2,7 +2,7 @@
     "name": "doeanderson/statamic-cloudinary",
     "description": "Cloudinary addon for Statamic 3",
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^7.2 || ^8.0",
         "cloudinary-labs/cloudinary-laravel": "^1.0",
         "laravel/framework": "^7.0 || ^8.0",
         "statamic/cms": "^3.0",
