@@ -3,6 +3,7 @@
 namespace DoeAnderson\StatamicCloudinary;
 
 use DoeAnderson\StatamicCloudinary\Actions\UploadToCloudinaryAction;
+use DoeAnderson\StatamicCloudinary\Console\Commands\UploadAssets;
 use DoeAnderson\StatamicCloudinary\GraphQL\FieldManager;
 use DoeAnderson\StatamicCloudinary\Tags\CloudinaryTags;
 use Illuminate\Support\Facades\Artisan;
@@ -32,11 +33,8 @@ class ServiceProvider extends AddonServiceProvider
         UploadToCloudinaryAction::class,
     ];
 
-    /**
-     * @var string[]
-     */
-    protected $tags = [
-        CloudinaryTags::class,
+    protected $commands = [
+        UploadAssets::class,
     ];
 
     /**
@@ -44,6 +42,13 @@ class ServiceProvider extends AddonServiceProvider
      */
     protected $subscribe = [
         Subscriber::class,
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $tags = [
+        CloudinaryTags::class,
     ];
 
     public function boot(): void
