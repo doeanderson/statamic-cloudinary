@@ -21,7 +21,7 @@ class AssetContainerBlueprint
 
     public function setupFields()
     {
-        $this->blueprint->ensureFieldInSection(
+        $this->blueprint->ensureFieldInTab(
             'cloudinary_public_id',
             [
                 'input_type' => 'text',
