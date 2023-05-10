@@ -157,7 +157,7 @@ class UploadAssets extends Command
             $this->info("Uploading assets from container: {$assetContainer->handle()}");
             $assetContainer->assets()->each(function (Asset $asset) {
                 $this->output->write("Uploading: {$asset->path()}...");
-                dispatch_now(new UploadAssetJob($asset));
+                dispatch_sync(new UploadAssetJob($asset));
                 $this->output->write('Done!');
                 $this->newLine();
             });
@@ -182,7 +182,7 @@ class UploadAssets extends Command
 
         $this->info("Uploading assets from container: {$this->container->handle()}");
         $this->output->write("Uploading: {$this->asset->path()}...");
-        dispatch_now(new UploadAssetJob($this->asset));
+        dispatch_sync(new UploadAssetJob($this->asset));
         $this->output->write('Done!');
         $this->newLine();
 

@@ -46,13 +46,13 @@ class Subscriber
             return;
         }
 
-        dispatch_now(new UploadAssetJob($event->asset));
+        dispatch_sync(new UploadAssetJob($event->asset));
     }
 
     public function handleAssetDeleted(AssetDeleted $event)
     {
         if (CloudinaryHelper::hasConfigurationForAssetContainer($event->asset->container())) {
-            dispatch_now(new DeleteAssetJob($event->asset));
+            dispatch_sync(new DeleteAssetJob($event->asset));
         }
     }
 
@@ -62,7 +62,7 @@ class Subscriber
             return;
         }
 
-        dispatch_now(new CreateFolderJob($event->folder));
+        dispatch_sync(new CreateFolderJob($event->folder));
     }
 
     public function handleAssetFolderDeleted(AssetFolderDeleted $event)
@@ -71,7 +71,7 @@ class Subscriber
             return;
         }
 
-        dispatch_now(new DeleteFolderJob($event->folder));
+        dispatch_sync(new DeleteFolderJob($event->folder));
     }
 
     public function handleAssetRenamed(AssetSaved $event)
@@ -90,6 +90,6 @@ class Subscriber
 
         $oldPath = CloudinaryHelper::getPublicId($event->asset) . '.' . CloudinaryHelper::getFileExtension($event->asset);
 
-        dispatch_now(new RenameAssetJob($event->asset, $oldPath));
+        dispatch_sync(new RenameAssetJob($event->asset, $oldPath));
     }
 }
