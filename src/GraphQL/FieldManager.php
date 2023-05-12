@@ -14,6 +14,7 @@ class FieldManager
     public function registerCustomFields(): void
     {
         $this->cloudinaryUrl();
+        $this->cloudinaryPublicId();
     }
 
     /**
@@ -35,6 +36,21 @@ class FieldManager
 
                     $image = Cloudinary::getImage($cloudinaryPublicId);
                     return (string) $image->toUrl();
+                }
+            ];
+        });
+
+        return $this;
+    }
+
+    protected function cloudinaryPublicId(): self
+    {
+        GraphQL::addField('AssetInterface', 'cloudinary_public_id', function () {
+            return [
+                'type' => GraphQL::string(),
+                'args' => [],
+                'resolve' => function (Asset $asset, $args) {
+                    return $asset->get('cloudinary_public_id');
                 }
             ];
         });
