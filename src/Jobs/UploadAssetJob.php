@@ -5,6 +5,7 @@ namespace DoeAnderson\StatamicCloudinary\Jobs;
 use CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -39,20 +40,22 @@ class UploadAssetJob implements ShouldQueue
         return 30;
     }
 
-    public function handle()
+    /**
+     * @throws Exception
+     */
+    public function handle(): void
     {
-        $cloudinaryEngine = Cloudinary::upload(
-            $this->asset->resolvedPath(),
-            [
-                'public_id' => CloudinaryHelper::getPublicId($this->asset),
-                'folder' => CloudinaryHelper::getCloudinaryUploadFolder($this->asset->container()),
-            ]
-        );
-        /* @var $cloudinaryEngine CloudinaryEngine */
-
-
-        $this->asset
-            ->set('cloudinary_public_id', $cloudinaryEngine->getResponse()['public_id'])
-            ->save();
+        try {
+            Cloudinary::upload(
+                $this->asset->resolvedPath(),
+                [
+                    'public_id' => CloudinaryHelper::getPublicId($this->asset),
+                    'folder' => CloudinaryHelper::getCloudinaryUploadFolder($this->asset->container()),
+                ]
+            );
+        } catch (Exception $e) {
+            $message = "Cloudinary: {$e->getMessage()}";
+            throw new Exception($message, 0, $e);
+        }
     }
 }

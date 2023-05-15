@@ -52,11 +52,7 @@ class CloudinaryTags extends Tags
             throw AssetNotFoundException::notExists($assetId);
         }
 
-        if (! CloudinaryHelper::hasCloudinaryId($asset)) {
-            throw AssetNotFoundException::notCloudinary($assetId);
-        }
-
-        return $this->constructImageTag($asset->cloudinary_public_id);
+        return $this->constructImageTag(CloudinaryHelper::getPublicId($asset));
     }
 
     /**

@@ -28,7 +28,7 @@ class DeleteFolderJob implements ShouldQueue
     {
         $this->assetFolder = $assetFolder;
     }
-    
+
     /**
      * @return int
      */
@@ -37,7 +37,7 @@ class DeleteFolderJob implements ShouldQueue
         return 30;
     }
 
-    public function handle()
+    public function handle(): void
     {
         $baseFolder = CloudinaryHelper::getCloudinaryUploadFolder($this->assetFolder->container());
         if (! empty($baseFolder)) {

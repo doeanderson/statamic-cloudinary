@@ -4,15 +4,13 @@ namespace DoeAnderson\StatamicCloudinary\Jobs;
 
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Assets\Asset;
-use Statamic\Facades\Asset as AssetApi;
 
 class RenameAssetJob implements ShouldQueue
 {
@@ -24,18 +22,11 @@ class RenameAssetJob implements ShouldQueue
     protected $asset;
 
     /**
-     * @var string
-     */
-    protected $oldPath;
-
-    /**
      * @param Asset $asset
-     * @param string $oldPath
      */
-    public function __construct(Asset $asset, string $oldPath)
+    public function __construct(Asset $asset)
     {
         $this->asset = $asset;
-        $this->oldPath = $oldPath;
     }
 
     /**
@@ -46,22 +37,22 @@ class RenameAssetJob implements ShouldQueue
         return 30;
     }
 
-    public function handle()
+    /**
+     * @throws Exception
+     */
+    public function handle(): void
     {
-        $currentPublicId = $this->asset->get('cloudinary_public_id');
-        if (is_null($currentPublicId)) {
-            return;
-        }
+        $oldPublicId = CloudinaryHelper::getPublicIdFromPath($this->asset->getOriginal('path'));
+        $newPublicId = CloudinaryHelper::getPublicIdFromPath($this->asset->path());
 
-        if (! is_null($this->oldPath)) {
-            $newPublicId = CloudinaryHelper::getPublicId($this->asset);
+        try {
             Cloudinary::rename(
-                $currentPublicId,
+                $oldPublicId,
                 $newPublicId
             );
-
-            $this->asset->set('cloudinary_public_id', $newPublicId);
-            $this->asset->save();
+        } catch (Exception $e) {
+            $message = "Cloudinary: {$e->getMessage()}";
+            throw new Exception($message, 0, $e);
         }
     }
 }
