@@ -2,6 +2,8 @@
 
 namespace DoeAnderson\StatamicCloudinary\Http\Resources\API;
 
+use Cloudinary;
+use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
 use Statamic\Assets\Asset;
 
 /**
@@ -13,10 +15,10 @@ class AssetResource extends \Statamic\Http\Resources\API\AssetResource
     {
         $data = parent::toArray($request);
 
-        $cloudinaryPublicId = $this->resource->get('cloudinary_public_id');
+        $cloudinaryPublicId = CloudinaryHelper::getPublicId($this->resource);
 
         if (! empty($cloudinaryPublicId)) {
-            $image = \Cloudinary::getImage($cloudinaryPublicId);
+            $image = Cloudinary::getImage($cloudinaryPublicId);
             $data['cloudinary_url'] = (string) $image->toUrl();
 
             // TODO: Add 'srcset' and 'sizes' values based on plugin config.

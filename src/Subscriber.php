@@ -80,16 +80,10 @@ class Subscriber
             return;
         }
 
-        if (! CloudinaryHelper::hasCloudinaryId($event->asset)) {
-            return;
-        }
-
         if (! CloudinaryHelper::isAssetRenamed($event->asset)) {
             return;
         }
 
-        $oldPath = CloudinaryHelper::getPublicId($event->asset) . '.' . CloudinaryHelper::getFileExtension($event->asset);
-
-        dispatch_sync(new RenameAssetJob($event->asset, $oldPath));
+        dispatch_sync(new RenameAssetJob($event->asset));
     }
 }

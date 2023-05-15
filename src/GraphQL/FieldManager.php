@@ -3,6 +3,7 @@
 namespace DoeAnderson\StatamicCloudinary\GraphQL;
 
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
 use Statamic\Assets\Asset;
 use Statamic\Facades\GraphQL;
 
@@ -29,12 +30,7 @@ class FieldManager
                 'type' => GraphQL::string(),
                 'args' => [],
                 'resolve' => function (Asset $asset, $args) {
-                    $cloudinaryPublicId = $asset->get('cloudinary_public_id');
-                    if (empty($cloudinaryPublicId)) {
-                        return null;
-                    }
-
-                    $image = Cloudinary::getImage($cloudinaryPublicId);
+                    $image = Cloudinary::getImage(CloudinaryHelper::getPublicId($asset));
                     return (string) $image->toUrl();
                 }
             ];
@@ -50,7 +46,7 @@ class FieldManager
                 'type' => GraphQL::string(),
                 'args' => [],
                 'resolve' => function (Asset $asset, $args) {
-                    return $asset->get('cloudinary_public_id');
+                    return CloudinaryHelper::getPublicId($asset);
                 }
             ];
         });

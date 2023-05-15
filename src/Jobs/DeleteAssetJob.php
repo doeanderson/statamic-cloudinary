@@ -3,6 +3,8 @@
 namespace DoeAnderson\StatamicCloudinary\Jobs;
 
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,13 +36,16 @@ class DeleteAssetJob implements ShouldQueue
         return 30;
     }
 
-    public function handle()
+    /**
+     * @throws Exception
+     */
+    public function handle(): void
     {
-        $publicId = $this->asset->get('cloudinary_public_id');
-        if (is_null($publicId)) {
-            return;
+        try {
+            Cloudinary::destroy(CloudinaryHelper::getPublicId($this->asset));
+        } catch (Exception $e) {
+            $message = "Cloudinary: {$e->getMessage()}";
+            throw new Exception($message, 0, $e);
         }
-
-        Cloudinary::destroy($publicId);
     }
 }

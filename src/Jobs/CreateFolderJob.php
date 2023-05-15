@@ -4,6 +4,7 @@ namespace DoeAnderson\StatamicCloudinary\Jobs;
 
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use DoeAnderson\StatamicCloudinary\Helpers\CloudinaryHelper;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -36,10 +37,18 @@ class CreateFolderJob implements ShouldQueue
         return 30;
     }
 
-    public function handle()
+    /**
+     * @throws Exception
+     */
+    public function handle(): void
     {
-        Cloudinary::admin()->createFolder(
-            CloudinaryHelper::getCloudinaryUploadFolder($this->assetFolder->container()) . '/' . $this->assetFolder->path()
-        );
+        try {
+            Cloudinary::admin()->createFolder(
+                CloudinaryHelper::getCloudinaryUploadFolder($this->assetFolder->container()) . '/' . $this->assetFolder->path()
+            );
+        } catch (Exception $e) {
+            $message = "Cloudinary: {$e->getMessage()}";
+            throw new Exception($message, 0, $e);
+        }
     }
 }
