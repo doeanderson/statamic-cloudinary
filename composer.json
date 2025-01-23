@@ -1,11 +1,11 @@
 {
     "name": "doeanderson/statamic-cloudinary",
-    "description": "Cloudinary addon for Statamic 3",
+    "description": "Cloudinary addon for Statamic",
     "require": {
         "php": "^8.0 || ^8.1",
         "cloudinary-labs/cloudinary-laravel": "^2.0",
         "laravel/framework": "^9.0 || ^10.0",
-        "statamic/cms": "^4.0",
+        "statamic/cms": "^4.0 || ^5.0",
         "stillat/proteus": "^2.0"
     },
     "license": "MIT",
