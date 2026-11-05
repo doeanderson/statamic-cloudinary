@@ -157,8 +157,13 @@ class UploadAssets extends Command
             $this->info("Uploading assets from container: {$assetContainer->handle()}");
             $assetContainer->assets()->each(function (Asset $asset) {
                 $this->output->write("Uploading: {$asset->path()}...");
-                dispatch_sync(new UploadAssetJob($asset));
-                $this->output->write('Done!');
+                try {
+                    dispatch_sync(new UploadAssetJob($asset));
+                    $this->output->write('Done!');
+                } catch (\Exception $e) {
+                    $this->error("Failed to upload asset {$asset->path()}: {$e->getMessage()}");
+                }
+
                 $this->newLine();
             });
             $this->newLine();
